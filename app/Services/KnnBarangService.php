@@ -150,16 +150,24 @@ class KnnBarangService
      */
     public function getNearestNeighbors(int $gudangId, int $jumlah, int $k): array
     {
-        $dataset = HistoryBarang::all();
+        $normalizedJumlah = $this->normalizeJumlah($jumlah);
+        $lokasiNumerik = $this->convertLokasi($gudangId);
 
         $distances = [];
 
-        foreach ($dataset as $data) {
+        foreach ($this->trainingData as $data) {
+            $normJumlah = $this->normalizeJumlah($data->jumlah);
+            $lokasiLatih = $this->convertLokasi($data->gudang_id);
+
             $distance = sqrt(
-                pow($data->gudang_id - $gudangId, 2) +
-                    pow($data->jumlah - $jumlah, 2)
+                pow($normJumlah - $normalizedJumlah, 2) +
+                    pow($lokasiLatih - $lokasiNumerik, 2)
             );
-            $distances[] = ['historyBarang' => $data, 'distance' => $distance];
+
+            $distances[] = [
+                'historyBarang' => $data,
+                'distance' => $distance
+            ];
         }
 
         usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);

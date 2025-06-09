@@ -47,18 +47,6 @@ class NewItemCrudController extends CrudController
         ]);
 
         CRUD::addField([
-            'name' => 'k_value',
-            'label' => 'Nilai K',
-            'type' => 'number',
-            'default' => 3,
-            'attributes' => [
-                'min' => 1,
-                'step' => 1,
-            ],
-        ]);
-
-
-        CRUD::addField([
             'name' => 'jenisbarang_id',
             'label' => 'Jenis Barang',
             'type' => 'select',
@@ -93,6 +81,18 @@ class NewItemCrudController extends CrudController
             'type' => 'number',
             'label' => 'Jumlah',
         ]);
+
+        CRUD::addField([
+            'name' => 'k_value',
+            'label' => 'Nilai K',
+            'type' => 'number',
+            'default' => 3,
+            'attributes' => [
+                'min' => 1,
+                'step' => 1,
+            ],
+        ]);
+
         $this->crud->removeSaveActions(['save_and_back', 'save_and_edit', 'save_and_new']);
 
         $this->crud->addSaveAction([
