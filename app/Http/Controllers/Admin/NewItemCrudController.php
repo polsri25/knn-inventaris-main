@@ -11,6 +11,7 @@ use App\Services\KnnBarangService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\CRUD\app\Library\Widget;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class NewItemCrudController
@@ -153,6 +154,7 @@ class NewItemCrudController extends CrudController
         } else {
             $result = KnnClassification::where('barang_id', $id)->with('barang.gudang')->firstOrFail();
         }
+
         // Decode neighbors jika masih dalam format string JSON
         $neighbors = is_string($result->neighbors)
             ? json_decode($result->neighbors, true)
@@ -165,9 +167,11 @@ class NewItemCrudController extends CrudController
             $gudangId = $neighbor['original_data']['gudang_id'] ?? null;
             $jenisBarangId = $neighbor['original_data']['jenisbarang_id'] ?? null;
 
+            // Ambil nama Gudang dan Nama Barang
             $gudangName = $gudangId ? Gudang::find($gudangId)?->nama : 'Tidak diketahui';
             $namaBarang = $jenisBarangId ? JenisBarang::find($jenisBarangId)?->nama : 'Tidak diketahui';
 
+            // Tambahkan informasi tambahan ke neighbor
             $neighbor['original_data']['nama_gudang'] = $gudangName;
             $neighbor['original_data']['nama_barang'] = $namaBarang;
 
@@ -182,18 +186,37 @@ class NewItemCrudController extends CrudController
             'nama_gudang' => optional($result->barang->gudang)->nama,
             'nama_barang' => optional($result->barang->jenisbarang)->nama,
         ];
+
+        // Ambil deskripsi pengaturan untuk barang yang bersangkutan
+        $deskripsiPengaturan = $this->getDeskripsiPengaturan($result->barang->jenisbarang_id, $inputBarang['gudang_id'], $result->barang->prioritas);
+
         // dd([
         //     'neighbors'      => $neighborsWithDetail,
         //     'k'              => $k,
         //     'inputBarang'    => $inputBarang,
         //     'predictedClass' => $result->barang->prioritas,
+        //     'deskripsiPengaturan' => $deskripsiPengaturan,
         // ]);
+
         return view('knn_statistics', [
-            'neighbors'      => $neighborsWithDetail,
-            'k'              => $k,
-            'inputBarang'    => $inputBarang,
-            'predictedClass' => $result->barang->prioritas,
+            'neighbors'          => $neighborsWithDetail,
+            'k'                  => $k,
+            'inputBarang'        => $inputBarang,
+            'predictedClass'     => $result->barang->prioritas,
+            'deskripsiPengaturan' => $deskripsiPengaturan, // Menambahkan deskripsi ke view
         ]);
+    }
+
+    private function getDeskripsiPengaturan($jenisBarangId, $gudangId, $prioritas)
+    {
+        // dd($jenisBarangId, $gudangId, $prioritas);
+        // Mencari deskripsi pengaturan barang berdasarkan jenis barang, gudang dan prioritas
+        $deskripsi = DB::table('deskripsihistoris')
+            ->where('jenisbarang_id', $jenisBarangId)
+            ->where('gudang_id', $gudangId)
+            ->whereRaw('LOWER(prioritas) = ?', [strtolower($prioritas)])
+            ->first();
+        return $deskripsi ? $deskripsi->deskripsi_pengaturan : 'Deskripsi tidak ditemukan';
     }
 
     public function store()
@@ -236,6 +259,8 @@ class NewItemCrudController extends CrudController
         // return redirect()->to($this->crud->route);
         return redirect()->to(backpack_url('new-item/knn-preview'));
     }
+
+
     public function getJenisBarang($gudangId)
     {
         // Mengambil jenis barang berdasarkan history_barang di gudang tertentu

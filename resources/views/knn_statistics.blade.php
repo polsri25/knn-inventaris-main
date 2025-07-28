@@ -17,7 +17,41 @@
 				</div>
 			</div>
 		</section>
-
+		@if (!empty($deskripsiPengaturan))
+			<div class="row mt-3">
+				<div class="col-md-12">
+					<div class="alert alert-warning border-warning shadow-sm" role="alert"
+						style="font-size: 1.15rem; font-weight: 500;">
+						<i class="la la-exclamation-triangle me-2" style="font-size: 1.5rem; vertical-align: middle;"></i>
+						<span class="text-dark">
+							<strong class="text-danger" style="font-size: 1.1rem;">
+								<i class="la la-lightbulb me-1"></i>
+								Saran Pengaturan Barang Prioritas
+								@php
+									$badgeClass = 'bg-secondary';
+									switch (strtolower($predictedClass)) {
+									    case 'tinggi':
+									        $badgeClass = 'bg-danger';
+									        break;
+									    case 'sedang':
+									        $badgeClass = 'bg-warning text-dark';
+									        break;
+									    case 'rendah':
+									        $badgeClass = 'bg-success';
+									        break;
+									}
+								@endphp
+								<span class="badge {{ $badgeClass }} text-uppercase ms-1" style="font-size: 1rem;">
+									{{ $predictedClass }}
+								</span>:
+							</strong>
+							<br>
+							{{ $deskripsiPengaturan }}
+						</span>
+					</div>
+				</div>
+			</div>
+		@endif
 		<!-- Hasil Prediksi Card -->
 		<div class="row">
 			<!-- Blok 2: Jumlah K -->
@@ -92,6 +126,7 @@
 				</div>
 			</div>
 		</div>
+
 
 		<!-- Action Buttons -->
 		{{-- <div class="row mt-3">
