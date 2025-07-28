@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\NewItemCrudController;
 use Illuminate\Support\Facades\Route;
 
 // --------------------------
@@ -25,6 +26,8 @@ Route::group([
 
     Route::crud('new-item', 'NewItemCrudController');
     Route::crud('user', 'UserCrudController');
+
+    Route::get('get-jenis-barang/{gudangId}', [NewItemCrudController::class, 'getJenisBarang']);
 }); // this should be the absolute last line of this file
 
 /**

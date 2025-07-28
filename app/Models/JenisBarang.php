@@ -35,7 +35,10 @@ class JenisBarang extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-
+    public function gudang()
+    {
+        return $this->belongsTo(Gudang::class);
+    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES

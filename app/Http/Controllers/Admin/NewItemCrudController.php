@@ -10,6 +10,7 @@ use App\Models\KnnClassification;
 use App\Services\KnnBarangService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Backpack\CRUD\app\Library\Widget;
 
 /**
  * Class NewItemCrudController
@@ -31,6 +32,7 @@ class NewItemCrudController extends CrudController
         CRUD::setEntityNameStrings('Barang', 'Input Barang Baru');
         // $this->knnService = new \App\Services\KnnBarangService();
         CRUD::addClause('whereHas', 'knnClassification');
+        Widget::add()->type('script')->content('assets/js/admin/forms/newItem.js');
     }
 
     protected function setupCreateOperation()
@@ -233,5 +235,16 @@ class NewItemCrudController extends CrudController
 
         // return redirect()->to($this->crud->route);
         return redirect()->to(backpack_url('new-item/knn-preview'));
+    }
+    public function getJenisBarang($gudangId)
+    {
+        // Mengambil jenis barang berdasarkan history_barang di gudang tertentu
+        $jenisBarang = HistoryBarang::where('gudang_id', $gudangId)
+            ->with('jenisbarang') // Men-load relasi jenis_barang
+            ->get()
+            ->pluck('jenisbarang') // Mengambil collection jenis_barang
+            ->unique('id'); // Menghindari duplikasi
+
+        return response()->json($jenisBarang);
     }
 }
