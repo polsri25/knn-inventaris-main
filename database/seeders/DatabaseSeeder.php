@@ -95,6 +95,24 @@ class DatabaseSeeder extends Seeder
                 'prioritas' => 'Rendah',
                 'deskripsi_pengaturan' => 'Disimpan dalam kotak di sudut Rak B untuk pengambilan jarang.'
             ],
+            [
+                'jenisbarang_id' => 1,// Router
+                'gudang_id' => 3, // Gudang C
+                'prioritas' => 'Tinggi',
+                'deskripsi_pengaturan' => 'Ditempatkan di Rak C1 dekat pintu masuk, dilabeli "Router Prioritas Tinggi" untuk akses cepat.'
+            ],
+            [
+                'jenisbarang_id' => 1,// Router
+                'gudang_id' => 3,
+                'prioritas' => 'Sedang',
+                'deskripsi_pengaturan' => 'Disimpan di Rak C2, dikelompokkan dengan perangkat jaringan sejenis.'
+            ],
+            [
+                'jenisbarang_id' => 1,// Router
+                'gudang_id' => 3,
+                'prioritas' => 'Rendah',
+                'deskripsi_pengaturan' => 'Ditumpuk dalam box anti-statis di Rak C3, untuk cadangan jarang digunakan.'
+            ],
 
             // Switch
             [
