@@ -28,6 +28,9 @@ Route::group([
     Route::crud('user', 'UserCrudController');
 
     Route::get('get-jenis-barang/{gudangId}', [NewItemCrudController::class, 'getJenisBarang']);
+
+    Route::get('new-item/print-report', [\App\Http\Controllers\Admin\NewItemCrudController::class, 'printReport'])
+    ->name('new-item.print-report');
 }); // this should be the absolute last line of this file
 
 /**

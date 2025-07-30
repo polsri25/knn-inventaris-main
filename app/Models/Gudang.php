@@ -36,6 +36,11 @@ class Gudang extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function historyBarangs()
+    {
+        return $this->hasMany(HistoryBarang::class, 'gudang_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | SCOPES

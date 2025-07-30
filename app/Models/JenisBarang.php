@@ -39,6 +39,11 @@ class JenisBarang extends Model
     {
         return $this->belongsTo(Gudang::class);
     }
+
+    public function historyBarangs()
+    {
+        return $this->hasMany(HistoryBarang::class, 'jenisbarang_id');
+    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES

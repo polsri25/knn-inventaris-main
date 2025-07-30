@@ -39,16 +39,26 @@ class JenisBarangCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::setFromDb(); // set columns from db columns.
+        CRUD::column('nama');
+        CRUD::column('kode');
+        CRUD::column('satuan');
+        CRUD::column('keterangan');
+
+        // Tambahkan kolom custom untuk menampilkan jumlah history
+        CRUD::addColumn([
+            'name' => 'history_count', // nama yang akan digunakan
+            'label' => 'Jumlah History Barang', // label yang ditampilkan
+            'type' => 'closure',
+            'function' => function ($entry) {
+                return $entry->historyBarangs->sum('jumlah');
+            }
+        ]);
+
         if (backpack_user()->role === 'pimpinan') {
             $this->crud->denyAccess('create');
             $this->crud->denyAccess('delete');
             $this->crud->denyAccess('update');
         }
-        /**
-         * Columns can be defined using the fluent syntax:
-         * - CRUD::column('price')->type('number');
-         */
     }
 
     /**

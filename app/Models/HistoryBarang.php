@@ -44,6 +44,7 @@ class HistoryBarang extends Model
     {
         return $this->belongsTo(\App\Models\JenisBarang::class);
     }
+
     public function knnClassification()
     {
         return $this->hasOne(\App\Models\KnnClassification::class, 'barang_id');

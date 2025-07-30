@@ -119,17 +119,17 @@ class NewItemCrudController extends CrudController
 
     protected function setupListOperation()
     {
-        CRUD::setFromDb(); // set columns from db columns.
+        CRUD::setFromDb();
 
         CRUD::column('gudang_id')->label('Gudang')->type('select')
-            ->entity('gudang') // nama fungsi relasi di model
+            ->entity('gudang')
             ->model(\App\Models\Gudang::class)
-            ->attribute('nama'); // field yang ingin ditampilkan (misal: 'nama')
+            ->attribute('nama');
 
         CRUD::column('jenisbarang_id')->label('Jenis Barang')->type('select')
-            ->entity('jenisbarang') // nama fungsi relasi di model
+            ->entity('jenisbarang')
             ->model(\App\Models\JenisBarang::class)
-            ->attribute('nama'); // field yang ingin ditampilkan (misal: 'nama')
+            ->attribute('nama');
 
         CRUD::column('prioritas')->label('Prioritas')->type('select_from_array')
             ->options(['tinggi' => 'Tinggi', 'sedang' => 'Sedang', 'rendah' => 'Rendah']);
@@ -139,8 +139,11 @@ class NewItemCrudController extends CrudController
             $this->crud->denyAccess('delete');
             $this->crud->denyAccess('update');
         }
-        $this->crud->addButtonFromView('line', 'showStatistics', 'setuplist_button', 'beginning');
+        if (backpack_user()->role == 'pimpinan') {
+            $this->crud->addButtonFromView('top', 'print_report', 'print_report_button', 'beginning');
+        }
 
+        $this->crud->addButtonFromView('line', 'showStatistics', 'setuplist_button', 'beginning');
         $this->crud->removeButton('show');
         $this->crud->removeButton('update');
     }
@@ -271,5 +274,26 @@ class NewItemCrudController extends CrudController
             ->unique('id'); // Menghindari duplikasi
 
         return response()->json($jenisBarang);
+    }
+
+    public function printReport()
+    {
+        $items = HistoryBarang::with(['gudang', 'jenisbarang', 'knnClassification'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalTinggi = $items->where('prioritas', 'tinggi')->sum('jumlah');
+        $totalSedang = $items->where('prioritas', 'sedang')->sum('jumlah');
+        $totalRendah = $items->where('prioritas', 'rendah')->sum('jumlah');
+        $totalSemua = $items->sum('jumlah');
+
+        return view('vendor.backpack.crud.print_report_history', [
+            'items' => $items,
+            'totalTinggi' => $totalTinggi,
+            'totalSedang' => $totalSedang,
+            'totalRendah' => $totalRendah,
+            'totalSemua' => $totalSemua,
+            'tanggalCetak' => now()->format('d F Y H:i:s'),
+        ]);
     }
 }
